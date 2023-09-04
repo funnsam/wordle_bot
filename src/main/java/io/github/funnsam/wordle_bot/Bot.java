@@ -1,5 +1,7 @@
 package io.github.funnsam.wordle_bot;
 
+import java.util.HashMap;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -7,7 +9,8 @@ import net.dv8tion.jda.api.events.session.ReadyEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import java.util.HashMap;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 
 public class Bot extends ListenerAdapter {
 	static JDA jda;
@@ -37,11 +40,24 @@ public class Bot extends ListenerAdapter {
 	}
 
 	@Override
+	public void onButtonInteraction(ButtonInteractionEvent event) {
+		switch (event.getComponentId()) {
+			case "start": {
+				wordle.put(event.getMember().getIdLong(), new WordleInstance());
+				event.reply("Done!").queue();
+				
+				break;
+			}
+		}
+	}
+
+	@Override
 	public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
 		switch (event.getName()) {
 			case "start": {
 				wordle.put(event.getMember().getIdLong(), new WordleInstance());
 				event.reply("Done!").queue();
+				
 				break;
 			}
 			case "show": {
@@ -72,8 +88,10 @@ public class Bot extends ListenerAdapter {
 						event.reply("Please submit a correct word!").queue();
 					} else {
 						w.guess(guess.toLowerCase());
-						event.replyEmbeds(w.show()).queue();
-						if (w.should_remove()) {
+						if (!w.should_remove()) {
+							event.replyEmbeds(w.show()).queue();
+						} else {
+							event.replyEmbeds(w.show()).addActionRow(Button.primary("start", "Start a new game")).queue();
 							wordle.remove(event.getMember().getIdLong());
 						}
 					}

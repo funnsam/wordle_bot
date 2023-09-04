@@ -1,5 +1,6 @@
 package io.github.funnsam.wordle_bot;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.Random;
 import java.time.Instant;
@@ -10,7 +11,6 @@ import java.io.BufferedReader;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import java.awt.Color;
 
 class WordleInstance {
 	class Guess {
@@ -86,11 +86,11 @@ class WordleInstance {
 		}
 
 		if (is_solved()) {
-			r += ":tada: You won! Use `/start` to start a new game!";
+			r += ":tada: Congratulations! You won!";
 		} else if (is_game_over()) {
-			r += String.format("<:despair:1139053884111851633> You lost! The word is %s!", correct);
+			r += String.format("<:despair:1139053884111851633> You lost! The word is [`%1$s`](https://google.com/search?q=%1$s+definition)!", correct);
 		} else {
-			r += String.format("Guess %d / 5", guesses.size());
+			r += String.format("Guess %d / 6", guesses.size());
 		}
 
 		EmbedBuilder eb = new EmbedBuilder()
@@ -111,7 +111,7 @@ class WordleInstance {
 	}
 
 	public boolean is_game_over() {
-		return (guesses.size() >= 5 && !is_solved());
+		return (guesses.size() >= 6 && !is_solved());
 	}
 
 	public boolean should_remove() {
