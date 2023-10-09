@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.util.List;
 import java.util.Random;
 import java.time.Instant;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -54,15 +55,18 @@ class WordleInstance {
 
 	public void guess(String guess) {
 		List<Guess.GuessResult> r = new ArrayList<>();
+		HashMap<Character, Integer> occ = new HashMap<>();
 		for (int i = 0; i < 5; i++) {
 			char c = guess.charAt(i);
+			int cnt = occ.getOrDefault(c, 0);
 			if (c == correct.charAt(i))  {
 				r.add(Guess.GuessResult.Correct);
-			} else if (correct.indexOf(c) != -1) {
+			} else if (correct.chars().filter(ch -> ch == c).count() > cnt) {
 				r.add(Guess.GuessResult.Exists);
 			} else {
 				r.add(Guess.GuessResult.None);
 			}
+			occ.put(c, cnt + 1);
 		}
 
 		guesses.add(new Guess(guess, r.toArray(new Guess.GuessResult[5])));
